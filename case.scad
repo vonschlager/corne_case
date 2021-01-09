@@ -2,8 +2,8 @@ $fn = 50;
 
 plate = 3;
 height = 15;
-wall = 2;
-radious = wall;
+wall = 3;
+tolerance = wall-2;
 
 inner_shape = [
     [0,0],
@@ -27,9 +27,14 @@ inner_shape = [
 ];
 
 module base_inner() {
-    translate([0, 0, plate]) {
+    minkowski() {
         linear_extrude(height=height) {
-            polygon(inner_shape);
+            translate([-tolerance, -tolerance, plate]) {
+                polygon(inner_shape);
+            }
+        }
+        translate ([tolerance, tolerance, plate]) {
+            cylinder(r = tolerance, h = 0.1);
         }
     }
 }
@@ -41,8 +46,8 @@ module base_outer() {
                 polygon(inner_shape);
             }
         }
-        translate ([radious, radious, 0]) {
-            cylinder(r = radious, h = 0.1);
+        translate ([wall, wall, 0]) {
+            cylinder(r = wall, h = 0.1);
         }
     }
 }
@@ -77,8 +82,16 @@ standoff_diameter = 4.20;
 standoff_radious = standoff_diameter / 2;
 standoff_height = height;
 
+module standoff_thread()
+{
+    cylinder(r = 1, h = standoff_height);
+}
+
 module standoff() {
-    cylinder(h = standoff_height, d = standoff_diameter);
+    difference() {
+        cylinder(h = standoff_height, d = standoff_diameter);
+        standoff_thread();
+    }
 }
 
 module standoffs() {
@@ -88,17 +101,17 @@ module standoffs() {
             standoff();
         }
         // second
-        translate([standoff_margin_second_left, standoff_margin_second_bottom, 0]) {
-            standoff();
-        }
+        // translate([standoff_margin_second_left, standoff_margin_second_bottom, 0]) {
+        //    standoff();
+        // }
         // third
         translate([standoff_margin_third_left, standoff_margin_third_bottom, 0]) {
             standoff();
         }
         // fourth
-        translate([standoff_margin_fourth_left, standoff_margin_fourth_bottom, 0]) {
-            standoff();
-        }
+        // translate([standoff_margin_fourth_left, standoff_margin_fourth_bottom, 0]) {
+        //    standoff();
+        // }
         // fifth
         translate([standoff_margin_fifth_left, standoff_margin_fifth_bottom, 0]) {
             standoff();
@@ -267,7 +280,7 @@ module switches() {
 }
 
 module diagonal_cut() {
-    translate([-20, -50, 5.00]) {
+    translate([-20, -50, 4.93]) {
         rotate([5, 0, 0]) {
             cube([170, 150, 20]);
         }
