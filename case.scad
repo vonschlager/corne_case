@@ -37,7 +37,7 @@ module base_inner() {
 module base_outer() {
     minkowski() {
         linear_extrude(height=height) {
-        translate([-wall, -wall, 0]) {
+            translate([-wall, -wall, 0]) {
                 polygon(inner_shape);
             }
         }
@@ -77,8 +77,7 @@ standoff_diameter = 4.20;
 standoff_radious = standoff_diameter / 2;
 standoff_height = height;
 
-module standoff(height)
-{
+module standoff() {
     cylinder(h = standoff_height, d = standoff_diameter);
 }
 
