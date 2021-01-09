@@ -95,9 +95,9 @@ module base_lower() {
 }
 
 widgets_cutout_margin_left = 114.59;
-widgets_cutout_margin_bottom = 22.00;
+widgets_cutout_margin_bottom = 4.43;
 widgets_cutout_x = 19.32;
-widgets_cutout_y = 34.41;
+widgets_cutout_y = 51.98;
 widgets_cutout_height = base_height + 1;
 
 module widgets_cutout() {
