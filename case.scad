@@ -1,7 +1,7 @@
 $fn = 50;
 
 plate = 3;
-height = 15;
+height = 17;
 wall = 3;
 tolerance = wall-2;
 
@@ -56,12 +56,12 @@ module base_outer() {
 }
 
 widgets_cutout_margin_left = 114.59-1.18;
-widgets_cutout_margin_bottom = 4.43;
-widgets_cutout_x = 19.32+1.18;
-widgets_cutout_y = 51.98;
+widgets_cutout_margin_bottom = 3.43;
+widgets_cutout_x = 19.32+1.18+tolerance;
+widgets_cutout_y = 52.98+tolerance;
 widgets_cutout_height = plate + 1;
 widgets_jack_cutout_x = 10.00;
-widgets_jack_cutout_y = 8.50;
+widgets_jack_cutout_y = 9.50;
 widgets_jack_cutout_height = 5.00;
 widgets_usb_cutout_x = 12.0;
 widgets_usb_cutout_y = 8.50;
@@ -101,7 +101,7 @@ standoff_height = height;
 
 module standoff_thread()
 {
-    cylinder(r = 1, h = standoff_height);
+    cylinder(r = 1.1, h = standoff_height);
 }
 
 module standoff() {
@@ -146,7 +146,7 @@ module standoffs() {
 
 module screw_hole() {
     union() {
-        cylinder(h = standoff_height, r = 2);
+        cylinder(h = standoff_height, r = 2.1);
         translate([0, 0, -standoff_height/2]) {
             standoff_thread();
         }
@@ -186,26 +186,26 @@ module screw_holes() {
     }
 }
 
-base_cover_height = 2.40;
-base_cover_tolerance = tolerance + 0.8;
+base_cover_height = 2.00;
+base_cover_tolerance = tolerance + 0.9;
 
 module base_cover() {
     difference() {
         minkowski() {
             linear_extrude(height=base_cover_height) {
-                translate([-tolerance, -tolerance, 0]) {
+                translate([-base_cover_tolerance, -base_cover_tolerance, 0]) {
                     polygon(inner_shape);
                 }
             }
-            translate ([tolerance, tolerance, 0]) {
-                cylinder(r = tolerance, h = 0.1);
+            translate ([base_cover_tolerance, base_cover_tolerance, 0]) {
+                cylinder(r = base_cover_tolerance, h = 0.1);
             }
         }
         screw_holes();
     }
 }
 
-base_cover_cutout_tolerance = base_cover_tolerance + 0.2;
+base_cover_cutout_tolerance = base_cover_tolerance + 0.1;
 
 module base_cover_cutout() {
     minkowski() {
@@ -375,7 +375,7 @@ module switches() {
 diagonal_cut_angle = 4;
 
 module diagonal_cut() {
-    translate([-20, -50, 6.96]) {
+    translate([-20, -50, 8.97]) {
         rotate([diagonal_cut_angle, 0, 0]) {
             cube([170, 150, 20]);
         }
@@ -391,7 +391,7 @@ module case() {
             };
             standoffs();
         }
-        translate([0, 0, 10.46-base_cover_height/2]) {
+        translate([0, 0, 12.40-base_cover_height/2]) {
             rotate([diagonal_cut_angle, 0, 0]) {
                 base_cover_cutout();
             }
