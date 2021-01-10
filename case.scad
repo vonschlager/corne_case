@@ -36,6 +36,9 @@ module base_inner() {
         translate ([tolerance, tolerance, plate]) {
             cylinder(r = tolerance, h = 0.1);
         }
+        // translate ([0, 0, plate]) {
+        //     cube([tolerance+1, tolerance+1, plate]);
+        // }
     }
 }
 
@@ -52,15 +55,29 @@ module base_outer() {
     }
 }
 
-widgets_cutout_margin_left = 114.59;
+widgets_cutout_margin_left = 114.59-1.18;
 widgets_cutout_margin_bottom = 4.43;
-widgets_cutout_x = 19.32;
+widgets_cutout_x = 19.32+1.18;
 widgets_cutout_y = 51.98;
 widgets_cutout_height = plate + 1;
+widgets_jack_cutout_x = 10.00;
+widgets_jack_cutout_y = 8.50;
+widgets_jack_cutout_height = 5.00;
+widgets_usb_cutout_x = 12.0;
+widgets_usb_cutout_y = 8.50;
+widgets_usb_cutout_height = 5.00;
 
 module widgets_cutout() {
-    translate([widgets_cutout_margin_left, widgets_cutout_margin_bottom, -0.5]) {
-        cube([widgets_cutout_x, widgets_cutout_y, widgets_cutout_height]);
+    union() {
+        translate([widgets_cutout_margin_left, widgets_cutout_margin_bottom, -0.5]) {
+            cube([widgets_cutout_x, widgets_cutout_y, widgets_cutout_height]);
+        }
+        translate([widgets_cutout_margin_left+widgets_cutout_x/2+widgets_jack_cutout_x/2, widgets_cutout_margin_bottom, -0.5]) {
+            cube([widgets_jack_cutout_x, widgets_jack_cutout_y, widgets_jack_cutout_height+0.5]);
+        }
+        translate([widgets_cutout_margin_left+widgets_cutout_x/2-widgets_usb_cutout_x/2, widgets_cutout_margin_bottom+widgets_cutout_y-widgets_usb_cutout_y/2, -0.5]) {
+            cube([widgets_usb_cutout_x, widgets_usb_cutout_y, widgets_usb_cutout_height+0.5]);
+        }
     }
 }
 
@@ -123,6 +140,82 @@ module standoffs() {
         // seventh
         translate([standoff_margin_seventh_left, standoff_margin_seventh_bottom, 0]) {
             standoff();
+        }
+    }
+}
+
+module screw_hole() {
+    union() {
+        cylinder(h = standoff_height, r = 2);
+        translate([0, 0, -standoff_height/2]) {
+            standoff_thread();
+        }
+    }
+}
+
+module screw_holes() {
+    translate([0, 0, base_cover_height/1.5]) {
+        // first
+        translate([standoff_margin_first_left, standoff_margin_first_bottom, 0]) {
+            screw_hole();
+        }
+        // second
+        // translate([standoff_margin_second_left, standoff_margin_second_bottom, 0]) {
+        //    screw_hole();
+        // }
+        // third
+        translate([standoff_margin_third_left, standoff_margin_third_bottom, 0]) {
+            screw_hole();
+        }
+        // fourth
+        // translate([standoff_margin_fourth_left, standoff_margin_fourth_bottom, 0]) {
+        //    screw_hole();
+        // }
+        // fifth
+        translate([standoff_margin_fifth_left, standoff_margin_fifth_bottom, 0]) {
+            screw_hole();
+        }
+        // sixth
+        translate([standoff_margin_sixth_left, standoff_margin_sixth_bottom, 0]) {
+            screw_hole();
+        }
+        // seventh
+        translate([standoff_margin_seventh_left, standoff_margin_seventh_bottom, 0]) {
+            screw_hole();
+        }
+    }
+}
+
+base_cover_height = 2.40;
+base_cover_tolerance = tolerance + 0.8;
+
+module base_cover() {
+    difference() {
+        minkowski() {
+            linear_extrude(height=base_cover_height) {
+                translate([-tolerance, -tolerance, 0]) {
+                    polygon(inner_shape);
+                }
+            }
+            translate ([tolerance, tolerance, 0]) {
+                cylinder(r = tolerance, h = 0.1);
+            }
+        }
+        screw_holes();
+    }
+}
+
+base_cover_cutout_tolerance = base_cover_tolerance + 0.2;
+
+module base_cover_cutout() {
+    minkowski() {
+        linear_extrude(height=base_cover_height*2) {
+            translate([-base_cover_cutout_tolerance, -base_cover_cutout_tolerance, 0]) {
+                polygon(inner_shape);
+            }
+        }
+        translate ([base_cover_cutout_tolerance, base_cover_cutout_tolerance, 0]) {
+            cylinder(r = base_cover_cutout_tolerance, h = 0.1);
         }
     }
 }
@@ -279,9 +372,11 @@ module switches() {
     }
 }
 
+diagonal_cut_angle = 4;
+
 module diagonal_cut() {
-    translate([-20, -50, 4.93]) {
-        rotate([5, 0, 0]) {
+    translate([-20, -50, 6.96]) {
+        rotate([diagonal_cut_angle, 0, 0]) {
             cube([170, 150, 20]);
         }
     }
@@ -296,10 +391,25 @@ module case() {
             };
             standoffs();
         }
+        translate([0, 0, 10.46-base_cover_height/2]) {
+            rotate([diagonal_cut_angle, 0, 0]) {
+                base_cover_cutout();
+            }
+        }
         switches();
         widgets_cutout();
         diagonal_cut();
     }
+
+    translate([0, 100, 0]) {
+        base_cover();
+    }
 }
 
 case();
+
+mirror([1, 0, 0]) {
+    translate([10, 0, 0]) {
+        case();
+    }
+}
