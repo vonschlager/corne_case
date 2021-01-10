@@ -144,9 +144,13 @@ module standoffs() {
     }
 }
 
+base_cover_height = 3.00;
+base_cover_tolerance = tolerance + 0.9;
+screw_head_height = 2.00;
+
 module screw_hole() {
     union() {
-        cylinder(h = standoff_height, r = 2.1);
+        cylinder(h = standoff_height, r = 2.3);
         translate([0, 0, -standoff_height/2]) {
             standoff_thread();
         }
@@ -154,7 +158,7 @@ module screw_hole() {
 }
 
 module screw_holes() {
-    translate([0, 0, base_cover_height/1.5]) {
+    translate([0, 0, base_cover_height-screw_head_height]) {
         // first
         translate([standoff_margin_first_left, standoff_margin_first_bottom, 0]) {
             screw_hole();
@@ -185,9 +189,6 @@ module screw_holes() {
         }
     }
 }
-
-base_cover_height = 2.00;
-base_cover_tolerance = tolerance + 0.9;
 
 module base_cover() {
     difference() {
@@ -391,7 +392,7 @@ module case() {
             };
             standoffs();
         }
-        translate([0, 0, 12.40-base_cover_height/2]) {
+        translate([0, 0, 12.97-base_cover_height/2]) {
             rotate([diagonal_cut_angle, 0, 0]) {
                 base_cover_cutout();
             }
