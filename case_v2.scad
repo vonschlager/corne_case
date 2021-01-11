@@ -207,41 +207,49 @@ standoff_margin_sixth_bottom = 41.33;
 standoff_margin_seventh_left = 108.33;
 standoff_margin_seventh_bottom = -6.17;
 standoff_diameter = 4.20;
-standoff_radious = standoff_diameter / 2;
+standoff_support_diameter = standoff_diameter+1;
 standoff_height = middle_plate_height+bottom_plate_height+pcb_height;
 
-module standoff() {
-    cylinder(h = standoff_height, d = standoff_diameter);
+module standoff(d, cube) {
+    if (cube) {
+        rotate([0, 0, 45]) {
+            translate([-d/2, -d/2, 0]) {
+                cube([d, d, standoff_height]);
+            }
+        }
+    } else {
+        cylinder(h = standoff_height, d = d);
+    }
 }
 
-module standoffs() {
+module standoffs(d, cube=false) {
     // first
     translate([standoff_margin_first_left, standoff_margin_first_bottom, 0]) {
-        standoff();
+        standoff(d, cube);
     }
     // second
     // translate([standoff_margin_second_left, standoff_margin_second_bottom, 0]) {
-    //    standoff();
+    //    standoff(d, cube);
     // }
     // third
     translate([standoff_margin_third_left, standoff_margin_third_bottom, 0]) {
-        standoff();
+        standoff(d, cube);
     }
     // fourth
     // translate([standoff_margin_fourth_left, standoff_margin_fourth_bottom, 0]) {
-    //    standoff();
+    //    standoff(d, cube);
     // }
     // fifth
     translate([standoff_margin_fifth_left, standoff_margin_fifth_bottom, 0]) {
-        standoff();
+        standoff(d, cube);
     }
     // sixth
     translate([standoff_margin_sixth_left, standoff_margin_sixth_bottom, 0]) {
-        standoff();
+        standoff(d, cube);
     }
     // seventh
     translate([standoff_margin_seventh_left, standoff_margin_seventh_bottom, 0]) {
-        standoff();
+        standoff(d, cube);
     }
 }
 
@@ -251,10 +259,10 @@ module diagonal_cut() {
     }
 }
 
-module base(height) {
+module base(height, r1=0.5, r2=-0.5) {
     linear_extrude(height=height) {
-        offset(r=0.5) {
-            offset(r=-0.5) {
+        offset(r=r1) {
+            offset(r=r2) {
                 polygon(inner_shape);
             }
         }
@@ -269,7 +277,7 @@ module case_top() {
     }
     difference() {
         translate([0, 0, top_plate_height]) {
-            standoffs();
+            standoffs(standoff_diameter);
         }
         translate([-20, -30, top_plate_height+pcb_height+middle_plate_height+0.5]) {
             diagonal_cut();
@@ -277,15 +285,23 @@ module case_top() {
     }
 }
 
+middle_components_cutout_offset = -2.0;
+
 module middle_components_cutout(height) {
     union() {
         linear_extrude(height=height) {
-            offset(delta=-2.0) {
+            offset(delta=middle_components_cutout_offset) {
                 polygon(inner_shape);
             }
         }
         translate([-2.5, 4, 0]) {
-            cube([10, 56.41-2*4, height]);
+            cube([10, 10, height]);
+        }
+        translate([-2.5, 4+10*2, 0]) {
+            cube([10, 10, height]);
+        }
+        translate([-2.5, 2.41+10*4, 0]) {
+            cube([10, 10, height]);
         }
         translate([widgets_cutout_margin_left, widgets_cutout_margin_bottom, 0]) {
             cube([widgets_cutout_x, widgets_cutout_y-1-3, height]);
@@ -297,12 +313,25 @@ module case_middle() {
     translate([133.91, 100, 0]) {
         mirror([1, 0, 0]) {
             difference() {
-                base(middle_plate_height);
-                translate([0, 0, middle_plate_height-middle_components_cutout_height]) {
-                    middle_components_cutout(middle_components_cutout_height+1);
+                union() {
+                    difference() {
+                        base(middle_plate_height);
+                        translate([0, 0, middle_plate_height-middle_components_cutout_height]) {
+                            middle_components_cutout(middle_components_cutout_height+1);
+                        }
+                    }
+                    translate([0, 0, 0]) {
+                        standoffs(standoff_support_diameter, true);
+                    }
+                    translate([widgets_cutout_margin_left+widgets_cutout_x/2, widgets_cutout_y/2, 0]) {
+                        cube([5, 20, middle_plate_height+1]);
+                    }
                 }
                 translate([0, 0, -1]) {
-                    standoffs();
+                    standoffs(standoff_diameter);
+                }
+                translate([0, 0, middle_plate_height]) {
+                    base(middle_plate_height+10, 0, middle_components_cutout_offset-0.5);
                 }
             }
         }
@@ -317,7 +346,7 @@ module case_bottom() {
                 diagonal_cut();
             }
             translate([0, 0, -1]) {
-                standoffs();
+                standoffs(standoff_diameter);
             }
         }
     }
