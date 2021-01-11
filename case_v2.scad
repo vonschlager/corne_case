@@ -4,7 +4,7 @@ pcb_height = 1.5;
 top_plate_height = 4.8;
 middle_plate_height = 5.0;
 middle_components_cutout_height = 3.0;
-bottom_plate_height = 10.0;
+bottom_plate_height = 7.0;
 plate_radious = 2;
 
 inner_shape = [
@@ -271,7 +271,7 @@ module case_top() {
         translate([0, 0, top_plate_height]) {
             standoffs();
         }
-        translate([-20, -30, top_plate_height+pcb_height+middle_plate_height+3.5]) {
+        translate([-20, -30, top_plate_height+pcb_height+middle_plate_height+0.5]) {
             diagonal_cut();
         }
     }
@@ -313,7 +313,7 @@ module case_bottom() {
     translate([0, 200, 0]) {
         difference() {
             base(bottom_plate_height);
-            translate([-20, -30, 3.4]) {
+            translate([-20, -30, 0.4]) {
                 diagonal_cut();
             }
             translate([0, 0, -1]) {
